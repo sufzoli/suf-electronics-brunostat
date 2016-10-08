@@ -1,0 +1,22 @@
+<html>
+  <head>
+    <link rel="icon" href="about:blank">
+  </head>
+  <body>
+    <form id="uploadform" enctype="multipart/form-data" method="post" action="/uploadfile">
+      target file name: <input type="text" id="filenamebox" /><br/>
+      <input type="file" id="fileupload" name="myfile" />
+      <input type="button" value="upload" onclick="start_upload();" />
+    </form>
+    <script type="text/javascript">
+      function start_upload()
+      {
+        var form = document.getElementById('uploadform');
+        var filenamebox = document.getElementById('filenamebox');
+        var fileupload = document.getElementById('fileupload');
+	fileupload.name=filenamebox.value;
+        form.submit();
+      }
+    </script>
+  </body>
+</html>
