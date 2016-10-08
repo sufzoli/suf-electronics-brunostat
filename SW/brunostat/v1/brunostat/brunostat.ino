@@ -10,6 +10,9 @@
 
 
 #define SERIAL_DEBUG
+#define NODEMCU
+// #define ELECTRODRAGON
+
 #define SERIAL_BAUD 115200
 #define CONFIG_PATH "/config.ini"
 
@@ -18,6 +21,19 @@
 #define TEMPLATE_TAG_BEGIN "<%"
 #define TEMPLATE_TAG_END "%>"
 #define TEMPLATE_DATATYPE "text/html"
+
+// Electrodragon module
+#ifdef ELECTRODRAGON
+  #define ONE_WIRE_BUS 14
+  #define HEATER 13
+#endif
+
+// NodeMCU
+#ifdef NODEMCU
+  #define ONE_WIRE_BUS 5
+  #define HEATER 4
+#endif
+
 
 const int upper_th= 5;
 const int lower_th= 5;
@@ -30,8 +46,7 @@ ESP8266WebServer server(80);
 File web_UploadFile;
 File web_UpgradeFile;
 
-// Data wire is plugged into pin D1 on the ESP8266 12-E - GPIO 5
-#define ONE_WIRE_BUS 14
+
 os_timer_t temp_TimerObj;
 bool temp_IsProcess;
 float temp_ValueFloat;
@@ -180,7 +195,6 @@ void web_HandleUpgrade()
         web_UpgradeFile.close();
       #ifdef SERIAL_DEBUG  
         Serial.println("File Closed");
-        Serial.println("File Closed");
         Serial.print("Uploaded Firmware Size - ");
         Serial.println(filesize);
       #endif
@@ -268,7 +282,6 @@ void web_HandleFiles()
       do
       {
         content += readStringUntilStr(&dataFile, TEMPLATE_TAG_BEGIN);
-        Serial.println(content);
         // ContentDebug = false;
         if(dataFile.position() >= dataFile.size())
         {
@@ -421,13 +434,13 @@ void temp_Process()
   intCurrTemp = (int)(temp_ValueFloat * 10);
   if(intCurrTemp < temp_Set - lower_th)
   {
-    digitalWrite(13, 1);
+    digitalWrite(HEATER, 1);
 //    Heat = true;
     webInsertionStrings["heatcolor"] = "red";
   }
   if(intCurrTemp > temp_Set + upper_th)
   {
-    digitalWrite(13, 0);
+    digitalWrite(HEATER, 0);
 //    Heat = false;
     webInsertionStrings["heatcolor"] = "green";
   }
@@ -445,8 +458,8 @@ void setup()
 #endif
   delay(10);
   spiffs_Init();
-  pinMode(13, OUTPUT);
-  digitalWrite(13, 0);
+  pinMode(HEATER, OUTPUT);
+  digitalWrite(HEATER, 0);
   sys_LoadConfig();
   temp_Set = sysConfig["/termostat/settemp"].toInt();
   Serial.print("Preset Temp: ");
@@ -455,7 +468,7 @@ void setup()
   wifi_Init_ClientMode(sysConfig["/wlan/ssid"], sysConfig["/wlan/password"]);
   web_Init();
   // webInsertionStrings["heatcolor"] = "blue"; // Heating algorithm not implemented yet, so this is a fake value
-  Serial.println("Firmware web update b0010");
+  Serial.println("Firmware web update b0011");
 }
 
 void loop()
