@@ -1,0 +1,5 @@
+[wlan]
+ssid=
+password=
+[termostat]
+settemp=150

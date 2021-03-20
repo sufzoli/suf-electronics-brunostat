@@ -1,0 +1,49 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <link rel="icon" href="about:blank" />
+  </head>
+  <body>
+    <p style="font-family:courier,'courier new',monospace;font-size: 2em;font-weight: bold; text-align:center; margin: 0px 0px 0px 0px;">BrunoStat</p>
+    <iframe id="ct_frame" height="90" width="210" src="/currenttemp.tpl" frameBorder="0" scrolling="no" style="margin: auto; display: block;"></iframe>
+    <iframe id="st_frame" height="0" width="0" src="/settemp" style="visibility:hidden;display:none" onload="get_target_temp();"></iframe>
+    <center>
+      <form style="padding-top: 10px;">
+        <input type="text" id="set_temp" value="" size="4" style="font-weight: bold; text-align:center;" /><b>&deg;C</b>
+        <input type="button" name="btn_up" value="&#x25B2;" onclick="change_temp(5);" />
+        <input type="button" name="btn_down" value="&#x25BC;" onclick="change_temp(-5);" />
+        <input type="button" name="btn_set" value="SET" onclick="set_desired_temp();" />
+      </form>
+    </center>
+    <script type="text/javascript">
+	function get_temp_value()
+	{
+	  var temp_box = document.getElementById('set_temp');
+	  return parseInt(temp_box.value.replace('.',''));
+	}
+	function set_temp_value(value)
+	{
+	  var temp_box = document.getElementById('set_temp');
+	  temp_box.value = value.substr(0,value.length-1) + '.' + value.substr(value.length-1,1);
+	}
+	function change_temp(value)
+	{
+	  var temp_int = get_temp_value();
+	  set_temp_value((temp_int + value).toString());
+	}
+	function set_desired_temp()
+	{
+	  document.getElementById('st_frame').src = '/settemp?temp=' + document.getElementById('set_temp').value.replace('.','');
+	}
+	function get_target_temp()
+	{
+	  var target_frame = document.getElementById('st_frame');
+	  var temp_box = document.getElementById('set_temp');
+	  var win = target_frame.contentWindow;
+	  var doc = target_frame.contentDocument? target_frame.contentDocument: target_frame.contentWindow.document;
+	  var ret_temp = doc.getElementById('ret_temp');
+	  set_temp_value(ret_temp.innerHTML.replace(' ',''));
+	}
+    </script>
+  </body>
+</html>
